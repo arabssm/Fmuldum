@@ -1,0 +1,17 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+@font-face {
+  font-family: 'Paperlogy';
+  src: url('/ara/public/Paperlogy.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font: 'Paperlogy';
+}
+
+body {
+  font-family: 'Paperlogy';
+}
