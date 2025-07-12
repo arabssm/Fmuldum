@@ -27,11 +27,9 @@ export default function Detail() {
   }, [id]);
 
   if (!doc1) return <Notfound />;
-
-  // 날짜 포맷
   let date = '';
-  if (doc1.created_at) {
-    const d = new Date(doc1.created_at);
+  if (doc1.createdAt) {
+    const d = new Date(doc1.createdAt);
     const Y = d.getFullYear();
     const M = String(d.getMonth() + 1).padStart(2, '0');
     const D = String(d.getDate()).padStart(2, '0');
@@ -67,7 +65,7 @@ export default function Detail() {
         <_.AdditionRow>
           <_.AdditionLeft>
             <_.Addition>{date}</_.Addition>
-            <_.Addition>작성자: 교사 {doc1.teacher_id || '알 수 없음'}</_.Addition>
+            <_.Addition>작성자: 교사 {doc1.teacherName || '알 수 없음'}</_.Addition>
           </_.AdditionLeft>
           <_.ButtonGroup>
             <button onClick={() => setShowModal(true)}>삭제하기</button>

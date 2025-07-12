@@ -10,7 +10,9 @@ const location = useLocation();
 return (
     <_.MainArea>
         {IconMenu.map((item) => {
-            const isActive = location.pathname === item.path;
+           const isActive = Array.isArray(item.path)
+           ? item.path.includes(location.pathname)
+           : location.pathname === item.path;
 
             const TagComponent =
                 item.label === '로그인'
@@ -22,7 +24,7 @@ return (
             return (
                 <TagComponent
                     key={item.label}
-                    onClick={() => navigate(item.path)}
+                    onClick={() => navigate(item.path[0])}
                     isActive={isActive}
                 >
                     <_.Icon

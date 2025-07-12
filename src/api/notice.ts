@@ -17,7 +17,7 @@ export default async function getNotice() {
 
 export async function getNoticeDetail(id) {
     try {
-      const res = await axiosInstance.get(`ara/notice/${id}?state=GENERAL`);
+      const res = await axiosInstance.get(`ara/notice/${id}`);
       if (res.status !== 200) {
         return res.status;
       }
@@ -64,14 +64,13 @@ export async function getNoticeDetail(id) {
 
   export async function createnoticeteamalert(title:String,content:String,files: string[],teacher:String,teacherId:number,state:String,team_id:number): Promise<string> {
     try {
-      const res = await axiosInstance.post('/tch/notices',{
+      const res = await axiosInstance.post('/tch/notice',{
         "title":title,
         "content":content,
         "Files":files,
-        "teacher":"최병준",
-        "teacherId":1001,
-        "state":"TEAM",
-        "team_id":1
+        "status":"TEAM",
+        "teamId":1,
+        "teacher":"최병준"
       });
       if (res.status !== 201) {
         throw new Error(`업로드 실패 (status: ${res.status})`);
@@ -88,7 +87,7 @@ export async function getNoticeDetail(id) {
         "title":title,
         "content":content,
         "Files":files,
-        "state":"GENERAL",
+        "status":"GENERAL",
         "teacher":"최병준"
       });
       if (res.status !== 201) {

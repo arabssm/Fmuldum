@@ -14,6 +14,8 @@ export default function CreateNotice() {
     const [showModal, setShowModal] = useState(false);
     const [imageFiles, setImageFiles] = useState<File[]>([]);
     const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     useEffect(() => {
         const createPreviews = async () => {
           const previews: string[] = await Promise.all(
@@ -77,22 +79,25 @@ export default function CreateNotice() {
         }
     };
     const handleSubmit = async () => {
+        if (isSubmitting) return; 
+        setIsSubmitting(true);
         try {
             const uploadedUrls: string[] = [];
 
             for (const file of imageFiles) {
-              const res = await savefile(file); 
-              uploadedUrls.push(res.fileUrl); 
+            const res = await savefile(file);         
+            uploadedUrls.push(res.fileUrl);           
             }
-            
-      
-          const isTeam = notice.team_id !== undefined && notice.team_id !== '';
-      
+
+            const filesPayload = uploadedUrls.map(url => ({ url })); 
+            const isTeam = notice.team_id !== undefined && notice.team_id !== '';
+
+                
           if (!isTeam) {
             await createnoticeallalert(
               notice.title,
               notice.content,
-              uploadedUrls,
+              filesPayload,
               "GENERAL",
               notice.teacher
             );
@@ -100,7 +105,7 @@ export default function CreateNotice() {
             await createnoticeteamalert(
               notice.title,
               notice.content,
-              uploadedUrls,
+              filesPayload,
               notice.teacher,
               notice.teacherId,
               "TEAM",
@@ -111,7 +116,9 @@ export default function CreateNotice() {
           setShowModal(true);
         } catch (err) {
           alert('공지 등록 실패');
-        }
+        }finally {
+            setIsSubmitting(false); 
+          }
       };
       
 
