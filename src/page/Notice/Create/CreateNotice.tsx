@@ -7,20 +7,31 @@ import data from '../Detail/data';
 import '@_styles';
 import useNoticeState from './useNoticeState';
 import { Notice } from './type';
-
+import { savefile,createnoticeallalert,createnoticeteamalert } from '../../../api/notice';
 export default function CreateNotice() {
     const navigate = useNavigate();
-    const [notice, setNotice] = useNoticeState();
+    const [notice, setNotice] = useNoticeState(); 
     const [showModal, setShowModal] = useState(false);
-
+    const [imageFiles, setImageFiles] = useState<File[]>([]);
+    const [previewUrls, setPreviewUrls] = useState<string[]>([]);
     useEffect(() => {
-        const saved = localStorage.getItem('notices');
-        if (saved) {
-            const savedNotices: Notice[] = JSON.parse(saved);
-            data.splice(0, data.length, ...savedNotices);
+        const createPreviews = async () => {
+          const previews: string[] = await Promise.all(
+            imageFiles.map((file) => {
+              return new Promise<string>((resolve) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result as string);
+                reader.readAsDataURL(file);
+              });
+            })
+          );
+          setPreviewUrls(previews);
+        };
+      
+        if (imageFiles.length > 0) {
+          createPreviews();
         }
-    }, []);
-
+      }, [imageFiles]);
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setNotice(prev => ({ ...prev, [name]: value }));
@@ -28,8 +39,8 @@ export default function CreateNotice() {
 
     const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         const value = e.target.value;
-        setNotice(prev => ({ ...prev, content: value.split('\n') }));
-    };
+        setNotice(prev => ({ ...prev, content: value }));
+      };
 
     const insertTag = (tag: string) => {
         const openTag = `<${tag}>`;
@@ -59,26 +70,50 @@ export default function CreateNotice() {
     };
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setNotice(prev => ({ ...prev, image: reader.result as string }));
-            };
-            reader.readAsDataURL(file);
+        const file = e.target.files;
+        if (file&& file.length > 0) {
+            const selected = Array.from(file);
+            setImageFiles(prev => [...prev, ...selected]);
         }
     };
+    const handleSubmit = async () => {
+        try {
+            const uploadedUrls: string[] = [];
 
-    const handleSubmit = () => {
-        const saved = localStorage.getItem('notices');
-        const current: Notice[] = saved ? JSON.parse(saved) : [];
-
-        const updated = [notice, ...current];
-        localStorage.setItem('notices', JSON.stringify(updated));
-        data.splice(0, data.length, ...updated);
-
-        setShowModal(true);
-    };
+            for (const file of imageFiles) {
+              const res = await savefile(file); 
+              uploadedUrls.push(res.fileUrl); 
+            }
+            
+      
+          const isTeam = notice.team_id !== undefined && notice.team_id !== '';
+      
+          if (!isTeam) {
+            await createnoticeallalert(
+              notice.title,
+              notice.content,
+              uploadedUrls,
+              "GENERAL",
+              notice.teacher
+            );
+          } else {
+            await createnoticeteamalert(
+              notice.title,
+              notice.content,
+              uploadedUrls,
+              notice.teacher,
+              notice.teacherId,
+              "TEAM",
+              notice.team_id
+            );
+          }
+      
+          setShowModal(true);
+        } catch (err) {
+          alert('공지 등록 실패');
+        }
+      };
+      
 
     return (
         <_.Container>
@@ -93,17 +128,17 @@ export default function CreateNotice() {
                         onChange={handleChange}
                         placeholder="공지사항의 제목을 등록하세요"
                     />
-                    <_.TextInput
+                    {/* <_.TextInput
                         type="text"
                         name="formattedDate"
                         value={notice.formattedDate}
                         onChange={handleChange}
                         placeholder="2008.12.09 ~ 2009.12.19"
-                    />
+                    /> */}
                     <_.TextInput
                         type="text"
-                        name="author"
-                        value={notice.author}
+                        name="team_id"
+                        value={notice.team_id}
                         onChange={handleChange}
                         placeholder="누구에게 공지할 지 등록하세요"
                     />
@@ -116,7 +151,7 @@ export default function CreateNotice() {
                     </_.TagBox>
                     <_.Textarea
                         id="notice-content"
-                        value={notice.content.join('\n')}
+                        value={notice.content}
                         onChange={handleContentChange}
                         placeholder="공지사항 내용을 입력하세요 (100자 이상)"
                     />
@@ -129,6 +164,19 @@ export default function CreateNotice() {
                     <_.Picture onClick={() => document.getElementById('image-upload')?.click()}>
                         이미지를 클릭하여 추가해주세요
                     </_.Picture>
+                    {previewUrls.length > 0 && (
+  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '10px' }}>
+    {previewUrls.map((url, idx) => (
+      <img
+        key={idx}
+        src={url}
+        alt={`미리보기 ${idx}`}
+        style={{ width: '120px', borderRadius: '6px' }}
+      />
+    ))}
+  </div>
+)}
+
                     <_.EnrollButton onClick={handleSubmit}>등록하기</_.EnrollButton>
                 </_.BoxGroup>
             </_.Wrapper>

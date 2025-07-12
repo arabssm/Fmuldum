@@ -1,0 +1,102 @@
+import axiosInstance from '../lib/axiosInatanse';
+
+export default async function getNotice() {
+    try {
+      const res = await axiosInstance.get(`ara/notice`);
+  
+      if (res.status !== 200) {
+        return res.status;
+      }
+      return res.data;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+
+
+export async function getNoticeDetail(id) {
+    try {
+      const res = await axiosInstance.get(`ara/notice/${id}?state=GENERAL`);
+      if (res.status !== 200) {
+        return res.status;
+      }
+      return res.data;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+  export async function DeleteNotice(id) {
+    try {
+      const res = await axiosInstance.delete(`/tch/notice/${id}`);
+      if (res.status !== 200) {
+        return res.status;
+      }
+      return res.data;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+
+
+  export async function savefile(file: File): Promise<string> {
+    try {
+      const formData = new FormData();
+    formData.append('files', file);
+      const res = await axiosInstance.post('/ara/files/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+  
+      if (res.status !== 200) {
+        throw new Error(`업로드 실패 (status: ${res.status})`);
+      }
+  
+      return res.data;
+    } catch (err) {
+      console.error('실패:', err);
+      throw err;
+    }
+  }
+
+  export async function createnoticeteamalert(title:String,content:String,files: string[],teacher:String,teacherId:number,state:String,team_id:number): Promise<string> {
+    try {
+      const res = await axiosInstance.post('/tch/notices',{
+        "title":title,
+        "content":content,
+        "Files":files,
+        "teacher":"최병준",
+        "teacherId":1001,
+        "state":"TEAM",
+        "team_id":1
+      });
+      if (res.status !== 201) {
+        throw new Error(`업로드 실패 (status: ${res.status})`);
+      }
+      return res.data;
+    } catch (err) {
+      console.error('실패:', err);
+      throw err;
+    }
+  }
+  export async function createnoticeallalert(title:String,content:String,files: string[],teacher:String,state:String): Promise<string> {
+    try {
+      const res = await axiosInstance.post('/tch/notice',{
+        "title":title,
+        "content":content,
+        "Files":files,
+        "state":"GENERAL",
+        "teacher":"최병준"
+      });
+      if (res.status !== 201) {
+        throw new Error(`업로드 실패 (status: ${res.status})`);
+      }
+      return res.data;
+    } catch (err) {
+      console.error('실패:', err);
+      throw err;
+    }
+  }

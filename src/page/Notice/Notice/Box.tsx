@@ -16,6 +16,7 @@ const formatDate = (iso: string) => {
 };
 
 export default function Box({ idx, title, date }: BoxProps) {
+    console.log(idx)
     const navigate = useNavigate();
     return (
         <_.BoxContainer onClick={() => navigate(`/notice/${idx}`)}>
