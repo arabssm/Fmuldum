@@ -17,11 +17,12 @@ export default function Notice() {
     
 
   const [posts, setPosts] = useState([]);
-
+  const [totalPages,setTotalpages]=useState(1);
   useEffect(() => {
     getNotice(page)
       .then((data) => {
         setPosts(data?.content ?? []);
+        setTotalpages(data.totalPages);
         console.log(data);
       })
       .catch((err) => {
@@ -33,7 +34,7 @@ export default function Notice() {
     n.title.toLowerCase().includes(search.toLowerCase())
   );
 
-  const totalPages = Math.ceil(filtered.length / 10);
+  
   const startIdx = (page - 1) * 10;
   const paginated = filtered.slice(startIdx, startIdx + 10);
 

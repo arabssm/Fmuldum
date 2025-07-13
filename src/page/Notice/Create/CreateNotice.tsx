@@ -71,12 +71,21 @@ export default function CreateNotice() {
     };
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files;
-        if (file&& file.length > 0) {
-            const selected = Array.from(file);
-            setImageFiles(prev => [...prev, ...selected]);
-        }
-    };
+        const files = Array.from(e.target.files ?? []);
+        setImageFiles(prev => [...prev, ...files]);
+      
+        const urls = files.map(f => URL.createObjectURL(f));
+        setPreviewUrls(prev => [...prev, ...urls]);
+      };
+      const handleRemoveImage = (index: number) => {
+        setImageFiles(prev => prev.filter((_, i) => i !== index));
+      
+        setPreviewUrls(prev => {
+          const urlToRevoke = prev[index];
+          if (urlToRevoke?.startsWith('blob:')) URL.revokeObjectURL(urlToRevoke);
+          return prev.filter((_, i) => i !== index);
+        });
+      };
     const handleSubmit = async () => {
         if (isSubmitting) return; 
         setIsSubmitting(true);
@@ -119,8 +128,11 @@ export default function CreateNotice() {
             setIsSubmitting(false); 
           }
       };
-      
-
+      useEffect(() => {
+        return () => previewUrls
+          .filter(u => u.startsWith('blob:'))
+          .forEach(URL.revokeObjectURL);
+      }, [previewUrls]);
     return (
         <_.Container>
             <NavBar />
@@ -171,17 +183,19 @@ export default function CreateNotice() {
                         이미지를 클릭하여 추가해주세요
                     </_.Picture>
                     {previewUrls.length > 0 && (
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '10px' }}>
-                            {previewUrls.map((url, idx) => (
-                            <img
-                                key={idx}
-                                src={url}
-                                alt={`미리보기 ${idx}`}
-                                style={{ width: '120px', borderRadius: '6px' }}
-                            />
-                            ))}
-                        </div>
-                        )}
+  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '10px' }}>
+    {previewUrls.map((url, idx) => (
+      <img
+        key={idx}
+        src={url}
+        alt={`미리보기 ${idx}`}
+        style={{ width: 120, borderRadius: 6, cursor: 'pointer' }}
+        onClick={() => handleRemoveImage(idx)}
+      />
+    ))}
+  </div>
+)}
+
                     <_.EnrollButton onClick={handleSubmit}>등록하기</_.EnrollButton>
                 </_.BoxGroup>
             </_.Wrapper>

@@ -5,7 +5,7 @@ import Notfound from '@_notfound/NotFound';
 import DeleteModal from '@_modal/Delete/DeleteModal';
 import ConfirmDeleteModal from '@_modal/Notice/ConfirmDelete';
 import makeDocument from '../makeDocument';
-import { getNoticeDetail,DeleteNotice } from '../../../../api/notice.js';
+import { getNoticeDetail,DeleteNotice,Deletefile } from '../../../../api/notice.js';
 import { useEffect, useState } from 'react';
 
 export default function Detail() {
@@ -45,6 +45,11 @@ export default function Detail() {
 
 
   const handleDelete = () => {
+    if (doc1?.files) {
+      for (const { fileId } of doc1.files) {
+        Deletefile(fileId);
+      }
+    }
     DeleteNotice(id)
     .then((data) => {
       setData(data);
@@ -79,7 +84,16 @@ export default function Detail() {
         </_.Content>
         <_.BackButton onClick={() => navigate(-1)}>이전</_.BackButton>
       </_.Wrapper>
-
+      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+        {doc1?.files?.map((file, idx) => (
+          <img
+            key={file.fileId ?? idx}
+            src={`${import.meta.env.VITE_API_URL}${file.filePath}`}
+            alt={file.fileName}
+            style={{ width: 120, borderRadius: 6 }}
+          />
+        ))}
+      </div>
       {showModal && (
         <DeleteModal
           onCancel={() => setShowModal(false)}

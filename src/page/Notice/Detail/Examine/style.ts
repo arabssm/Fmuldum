@@ -93,3 +93,6 @@ export const ButtonGroup = styled.div`
         }
     }
 `;
+export const H3=styled.h3`
+    color: red;
+`;

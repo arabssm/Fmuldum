@@ -2,8 +2,8 @@ import axiosInstance from '../lib/axiosInatanse';
 
 export default async function getNotice(page) {
     try {
-      // const res = await axiosInstance.get(`tch/notice?page=${page}`);
-      const res = await axiosInstance.get(`tch/notice?`);
+      const res = await axiosInstance.get(`tch/notice?page=${page-1}`);
+      // const res = await axiosInstance.get(`tch/notice?`);
       if (res.status !== 200) {
         return res.status;
       }
@@ -67,7 +67,7 @@ export async function getNoticeDetail(id) {
       const res = await axiosInstance.post('/tch/notice',{
         "title":title,
         "content":content,
-        "Files":files,
+        "attachments":files,
         "status":"TEAM",
         "teamId":1,
         "teacher":"최병준"
@@ -86,7 +86,7 @@ export async function getNoticeDetail(id) {
       const res = await axiosInstance.post('/tch/notice',{
         "title":title,
         "content":content,
-        "Files":files,
+        "attachments":files,
         "status":"GENERAL",
         "teacher":"최병준"
       });
@@ -106,8 +106,8 @@ export async function getNoticeDetail(id) {
       const res = await axiosInstance.patch(`/tch/notice/${id}`,{
         "title":title,
         "content":content,
-        "Files":files,
-        "status":"TEAM",
+        "files":files,
+        "state":"TEAM",
         "teamId":1,
         "teacher":"최병준"
       });
@@ -125,8 +125,8 @@ export async function getNoticeDetail(id) {
       const res = await axiosInstance.patch(`/tch/notice/${id}`,{
         "title":title,
         "content":content,
-        "Files":files,
-        "status":"GENERAL",
+        "files":files,
+        "state":"GENERAL",
         "teacher":"최병준"
       });
       if (res.status !== 200) {
@@ -135,6 +135,18 @@ export async function getNoticeDetail(id) {
       return res.data;
     } catch (err) {
       console.error('실패:', err);
+      throw err;
+    }
+  }
+  export async function Deletefile(id) {
+    try {
+      const res = await axiosInstance.delete(`/ara/files/${id}`);
+      if (res.status !== 200) {
+        return res.status;
+      }
+      return res.data;
+    } catch (err) {
+      console.log(err);
       throw err;
     }
   }

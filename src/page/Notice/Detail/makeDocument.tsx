@@ -1,6 +1,6 @@
 import type { JSX } from '@emotion/react/jsx-runtime';
 import type { ReactNode } from 'react';
-
+import * as _ from './Examine/style';
 export default function makeDocument(text: string = ''): JSX.Element | null {
 const tagPatterns: { pattern: RegExp; component: (content: ReactNode) => ReactNode }[] = [
   {
@@ -13,7 +13,7 @@ const tagPatterns: { pattern: RegExp; component: (content: ReactNode) => ReactNo
   },
   {
     pattern: /<제목3>\n?([\s\S]*?)\n?<\/제목3>/,
-    component: content => <h3>{content}</h3>,
+    component: content => <_.H3>{content}</_.H3>,
   },
   {
     pattern: /<제목4>\n?([\s\S]*?)\n?<\/제목4>/,
