@@ -2,7 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import * as _ from './style';
 import '@_styles';
-import { icons } from './data';
+import Search from '../../../assets/icon/Search.svg';
+import Add from '../../../assets/icon/Add.svg'
 import Box from './Box';
 import NavBar from '@_navbar/NavBar';
 import Pagination from './Pagination';
@@ -18,7 +19,7 @@ export default function Notice() {
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    getNotice()
+    getNotice(page)
       .then((data) => {
         setPosts(data?.content ?? []);
         console.log(data);
@@ -47,7 +48,7 @@ export default function Notice() {
         <_.Wrapper>
             <_.PageTitle>공지사항</_.PageTitle>
             <_.SearchBar>
-            <img src={icons.Search} alt="Search" />
+            <img src={Search} alt="Search" />
             <_.SearchInput
                 type="text"
                 placeholder="공지사항 검색"
@@ -59,7 +60,7 @@ export default function Notice() {
             />
             </_.SearchBar>
             <_.Add
-            src={icons.Add}
+            src={Add}
             alt="Add"
             onClick={() => navigate('/create-notice')}
             />

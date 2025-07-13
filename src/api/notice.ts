@@ -1,9 +1,9 @@
 import axiosInstance from '../lib/axiosInatanse';
 
-export default async function getNotice() {
+export default async function getNotice(page) {
     try {
-      const res = await axiosInstance.get(`ara/notice`);
-  
+      // const res = await axiosInstance.get(`tch/notice?page=${page}`);
+      const res = await axiosInstance.get(`tch/notice?`);
       if (res.status !== 200) {
         return res.status;
       }
@@ -91,6 +91,45 @@ export async function getNoticeDetail(id) {
         "teacher":"최병준"
       });
       if (res.status !== 201) {
+        throw new Error(`업로드 실패 (status: ${res.status})`);
+      }
+      return res.data;
+    } catch (err) {
+      console.error('실패:', err);
+      throw err;
+    }
+  }
+
+
+  export async function modifynotice(id:number,title:String,content:String,files: string[],teacher:String,teacherId:number,state:String,team_id:number): Promise<string> {
+    try {
+      const res = await axiosInstance.patch(`/tch/notice/${id}`,{
+        "title":title,
+        "content":content,
+        "Files":files,
+        "status":"TEAM",
+        "teamId":1,
+        "teacher":"최병준"
+      });
+      if (res.status !== 200) {
+        throw new Error(`업로드 실패 (status: ${res.status})`);
+      }
+      return res.data;
+    } catch (err) {
+      console.error('실패:', err);
+      throw err;
+    }
+  }
+  export async function modifynotice1(id:number,title:String,content:String,files: string[],teacher:String,state:String): Promise<string> {
+    try {
+      const res = await axiosInstance.patch(`/tch/notice/${id}`,{
+        "title":title,
+        "content":content,
+        "Files":files,
+        "status":"GENERAL",
+        "teacher":"최병준"
+      });
+      if (res.status !== 200) {
         throw new Error(`업로드 실패 (status: ${res.status})`);
       }
       return res.data;

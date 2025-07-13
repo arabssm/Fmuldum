@@ -5,14 +5,22 @@ import '@_styles';
 
 export default function NavBar() {
 const navigate = useNavigate();
-const location = useLocation();
+const { pathname } = useLocation();
+
 
 return (
     <_.MainArea>
         {IconMenu.map((item) => {
-           const isActive = Array.isArray(item.path)
-           ? item.path.includes(location.pathname)
-           : location.pathname === item.path;
+           const isLogin = item.label === '로그인';
+
+           const isActive = isLogin
+             ? false
+             : Array.isArray(item.path)
+             ? item.path.some(p =>
+                pathname === p || pathname.startsWith(p + '/')
+               )
+             : pathname === item.path;
+         
 
             const TagComponent =
                 item.label === '로그인'
