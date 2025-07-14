@@ -6,7 +6,8 @@ import EditSuccess from '@_modal/Notice/EditSuccess';
 import '@_styles';
 import useNoticeState from './useNoticeState';
 import { Notice } from './type';
-import { savefile,createnoticeallalert,createnoticeteamalert } from '../../../api/notice';
+import { savefile, createnoticeallalert, createnoticeteamalert } from '../../../api/notice';
+
 export default function CreateNotice() {
     const navigate = useNavigate();
     const [notice, setNotice] = useNoticeState(); 
@@ -15,24 +16,32 @@ export default function CreateNotice() {
     const [previewUrls, setPreviewUrls] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    // ✅ 팀 목록
+    const [teams, setTeams] = useState([
+        { id: 'apple', name: '사과' },
+        { id: 'banana', name: '바나나' },
+        { id: 'orange', name: '오렌지' },
+    ]);
+
     useEffect(() => {
         const createPreviews = async () => {
-          const previews: string[] = await Promise.all(
-            imageFiles.map((file) => {
-              return new Promise<string>((resolve) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result as string);
-                reader.readAsDataURL(file);
-              });
-            })
-          );
-          setPreviewUrls(previews);
+            const previews: string[] = await Promise.all(
+                imageFiles.map((file) => {
+                    return new Promise<string>((resolve) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result as string);
+                        reader.readAsDataURL(file);
+                    });
+                })
+            );
+            setPreviewUrls(previews);
         };
-      
+
         if (imageFiles.length > 0) {
-          createPreviews();
+            createPreviews();
         }
-      }, [imageFiles]);
+    }, [imageFiles]);
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setNotice(prev => ({ ...prev, [name]: value }));
@@ -41,7 +50,7 @@ export default function CreateNotice() {
     const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         const value = e.target.value;
         setNotice(prev => ({ ...prev, content: value }));
-      };
+    };
 
     const insertTag = (tag: string) => {
         const openTag = `<${tag}>`;
@@ -73,66 +82,69 @@ export default function CreateNotice() {
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files ?? []);
         setImageFiles(prev => [...prev, ...files]);
-      
+
         const urls = files.map(f => URL.createObjectURL(f));
         setPreviewUrls(prev => [...prev, ...urls]);
-      };
-      const handleRemoveImage = (index: number) => {
+    };
+
+    const handleRemoveImage = (index: number) => {
         setImageFiles(prev => prev.filter((_, i) => i !== index));
-      
+
         setPreviewUrls(prev => {
-          const urlToRevoke = prev[index];
-          if (urlToRevoke?.startsWith('blob:')) URL.revokeObjectURL(urlToRevoke);
-          return prev.filter((_, i) => i !== index);
+            const urlToRevoke = prev[index];
+            if (urlToRevoke?.startsWith('blob:')) URL.revokeObjectURL(urlToRevoke);
+            return prev.filter((_, i) => i !== index);
         });
-      };
+    };
+
     const handleSubmit = async () => {
-        if (isSubmitting) return; 
+        if (isSubmitting) return;
         setIsSubmitting(true);
         try {
             const uploadedUrls: string[] = [];
 
             for (const file of imageFiles) {
-            const res = await savefile(file);         
-            uploadedUrls.push(res.fileUrl);           
+                const res = await savefile(file);
+                uploadedUrls.push(res.fileUrl);
             }
 
-            const filesPayload = uploadedUrls.map(url => ({ url })); 
+            const filesPayload = uploadedUrls.map(url => ({ url }));
             const isTeam = notice.team_id !== undefined && notice.team_id !== '';
 
-                
-          if (!isTeam) {
-            await createnoticeallalert(
-              notice.title,
-              notice.content,
-              filesPayload,
-              "GENERAL",
-              notice.teacher
-            );
-          } else {
-            await createnoticeteamalert(
-              notice.title,
-              notice.content,
-              filesPayload,
-              notice.teacher,
-              notice.teacherId,
-              "TEAM",
-              notice.team_id
-            );
-          }
-      
-          setShowModal(true);
+            if (!isTeam) {
+                await createnoticeallalert(
+                    notice.title,
+                    notice.content,
+                    filesPayload,
+                    "GENERAL",
+                    notice.teacher
+                );
+            } else {
+                await createnoticeteamalert(
+                    notice.title,
+                    notice.content,
+                    filesPayload,
+                    notice.teacher,
+                    notice.teacherId,
+                    "TEAM",
+                    notice.team_id
+                );
+            }
+
+            setShowModal(true);
         } catch (err) {
-          alert('공지 등록 실패');
-        }finally {
-            setIsSubmitting(false); 
-          }
-      };
-      useEffect(() => {
+            alert('공지 등록 실패');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    useEffect(() => {
         return () => previewUrls
-          .filter(u => u.startsWith('blob:'))
-          .forEach(URL.revokeObjectURL);
-      }, [previewUrls]);
+            .filter(u => u.startsWith('blob:'))
+            .forEach(URL.revokeObjectURL);
+    }, [previewUrls]);
+
     return (
         <_.Container>
             <NavBar />
@@ -146,20 +158,28 @@ export default function CreateNotice() {
                         onChange={handleChange}
                         placeholder="공지사항의 제목을 등록하세요"
                     />
-                    {/* <_.TextInput
-                        type="text"
-                        name="formattedDate"
-                        value={notice.formattedDate}
-                        onChange={handleChange}
-                        placeholder="2008.12.09 ~ 2009.12.19"
-                    /> */}
-                    <_.TextInput
-                        type="text"
-                        name="team_id"
-                        value={notice.team_id}
-                        onChange={handleChange}
-                        placeholder="누구에게 공지할 지 등록하세요"
-                    />
+
+                      <_.SelectInput
+                          name="team_id"
+                          value={notice.team_id}
+                          onChange={handleChange}
+                        >
+                          <option value="">선택하세요</option>
+                          <option value="ara">아라</option>
+                          <option value="andamiro">안다미로</option>
+                          <option value="insert">인서트</option>
+                          <option value="odessey">오디세이</option>
+                          <option value="pluto">플루토</option>
+                          <option value="tera">테라</option>
+                          <option value="solvit">솔빗</option>
+                          <option value="Echo">Echo</option>
+                          <option value="Haro">Haro</option>
+                          <option value="Baro">Baro</option>
+                          <option value="Paletto">Paletto</option>
+                          <option value="PARADOX">PARADOX</option>
+                        </_.SelectInput>
+
+
                     <_.TagBox>
                         <_.TagButton onClick={() => insertTag('제목1')}>h1</_.TagButton>
                         <_.TagButton onClick={() => insertTag('제목2')}>h2</_.TagButton>
@@ -167,38 +187,43 @@ export default function CreateNotice() {
                         <_.TagButton onClick={() => insertTag('제목4')}>h4</_.TagButton>
                         <_.TagButton onClick={() => insertTag('강조')}>B</_.TagButton>
                     </_.TagBox>
+
                     <_.Textarea
                         id="notice-content"
                         value={notice.content}
                         onChange={handleContentChange}
                         placeholder="공지사항 내용을 입력하세요 (100자 이상)"
                     />
+
                     <_.ChangeImg
                         type="file"
                         accept="image/*"
                         id="image-upload"
                         onChange={handleImageChange}
                     />
+
                     <_.Picture onClick={() => document.getElementById('image-upload')?.click()}>
                         이미지를 클릭하여 추가해주세요
                     </_.Picture>
+
                     {previewUrls.length > 0 && (
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '10px' }}>
-                        {previewUrls.map((url, idx) => (
-                          <img
-                            key={idx}
-                            src={url}
-                            alt={`미리보기 ${idx}`}
-                            style={{ width: 120, borderRadius: 6, cursor: 'pointer' }}
-                            onClick={() => handleRemoveImage(idx)}
-                          />
-                        ))}
-                      </div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '10px' }}>
+                            {previewUrls.map((url, idx) => (
+                                <img
+                                    key={idx}
+                                    src={url}
+                                    alt={`미리보기 ${idx}`}
+                                    style={{ width: 120, borderRadius: 6, cursor: 'pointer' }}
+                                    onClick={() => handleRemoveImage(idx)}
+                                />
+                            ))}
+                        </div>
                     )}
 
                     <_.EnrollButton onClick={handleSubmit}>등록하기</_.EnrollButton>
                 </_.BoxGroup>
             </_.Wrapper>
+
             {showModal && (
                 <EditSuccess
                     onClose={() => {
