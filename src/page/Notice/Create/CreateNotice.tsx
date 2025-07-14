@@ -183,18 +183,18 @@ export default function CreateNotice() {
                         이미지를 클릭하여 추가해주세요
                     </_.Picture>
                     {previewUrls.length > 0 && (
-  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '10px' }}>
-    {previewUrls.map((url, idx) => (
-      <img
-        key={idx}
-        src={url}
-        alt={`미리보기 ${idx}`}
-        style={{ width: 120, borderRadius: 6, cursor: 'pointer' }}
-        onClick={() => handleRemoveImage(idx)}
-      />
-    ))}
-  </div>
-)}
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '10px' }}>
+                        {previewUrls.map((url, idx) => (
+                          <img
+                            key={idx}
+                            src={url}
+                            alt={`미리보기 ${idx}`}
+                            style={{ width: 120, borderRadius: 6, cursor: 'pointer' }}
+                            onClick={() => handleRemoveImage(idx)}
+                          />
+                        ))}
+                      </div>
+                    )}
 
                     <_.EnrollButton onClick={handleSubmit}>등록하기</_.EnrollButton>
                 </_.BoxGroup>
