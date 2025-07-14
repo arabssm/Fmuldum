@@ -32,13 +32,18 @@ export const ItemIndex = styled.div<{ selected?: boolean }>`
   align-items: center;
 `;
 
-export const ItemName = styled.a`
+export const ItemName = styled.button`
   flex: 1;
   font-size: 1rem;
   padding: 1% 2%;
+  border: transparent;
+  background-color: transparent;
+  text-align: left;
   color: #333;
   text-decoration: none;
   border-right: 1px solid #B2B2B2;
+  cursor: pointer;
+  font-family: 'Paperlogy';
 
   &:hover {
     text-decoration: underline;

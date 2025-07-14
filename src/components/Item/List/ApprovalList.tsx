@@ -12,9 +12,7 @@ export default function ApprovalList({ selectAll }: Props) {
             <_.ItemIndex selected={selectAll}>
               {String(index + 1).padStart(2, '0')}
             </_.ItemIndex>
-            <_.ItemName href="https://github.com/dpqlsn" target="_blank">
-              {name}
-            </_.ItemName>
+            <_.ItemName> {name} </_.ItemName>
             <_.ItemInput placeholder="사유를 적기" />
           </_.ItemRow>
         ))}
