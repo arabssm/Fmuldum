@@ -2,11 +2,11 @@ import { useState } from 'react';
 import * as _ from './style';
 import NavBar from '@_components/NavBar/NavBar';
 import data, { Props } from './data';
-import DeleteModal from '@_components/Modal/Delete/DeleteModal';
+import DetailItem from '@_modal/Item/DetailItem';
 
 export default function ApprovalList({ selectAll }: Props) {
   const [modalOpen, setModalOpen] = useState(false);
-  const [, setSelectedName] = useState('');
+  const [selectedName, setSelectedName] = useState('');
 
   const handleItemClick = (name: string) => {
     setSelectedName(name);
@@ -36,7 +36,7 @@ export default function ApprovalList({ selectAll }: Props) {
       </_.ListWrapper>
 
       {modalOpen && (
-        <DeleteModal onClick={closeModal} />
+        <DetailItem name={selectedName} onClose={closeModal} />
       )}
     </_.Container>
   );
