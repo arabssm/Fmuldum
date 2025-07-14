@@ -36,8 +36,7 @@ export default function ApprovalList({ selectAll }: Props) {
       </_.ListWrapper>
 
       {modalOpen && (
-        <DeleteModal onClick={closeModal}>
-        </DeleteModal>
+        <DeleteModal onClick={closeModal} />
       )}
     </_.Container>
   );
