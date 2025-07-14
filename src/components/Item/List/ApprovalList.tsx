@@ -1,8 +1,23 @@
+import { useState } from 'react';
 import * as _ from './style';
 import NavBar from '@_components/NavBar/NavBar';
 import data, { Props } from './data';
+import DeleteModal from '@_components/Modal/Delete/DeleteModal';
 
 export default function ApprovalList({ selectAll }: Props) {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [, setSelectedName] = useState('');
+
+  const handleItemClick = (name: string) => {
+    setSelectedName(name);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setSelectedName('');
+  };
+
   return (
     <_.Container>
       <NavBar />
@@ -12,11 +27,18 @@ export default function ApprovalList({ selectAll }: Props) {
             <_.ItemIndex selected={selectAll}>
               {String(index + 1).padStart(2, '0')}
             </_.ItemIndex>
-            <_.ItemName> {name} </_.ItemName>
+            <_.ItemName onClick={() => handleItemClick(name)}>
+              {name}
+            </_.ItemName>
             <_.ItemInput placeholder="사유를 적기" />
           </_.ItemRow>
         ))}
       </_.ListWrapper>
+
+      {modalOpen && (
+        <DeleteModal onClick={closeModal}>
+        </DeleteModal>
+      )}
     </_.Container>
   );
 }
